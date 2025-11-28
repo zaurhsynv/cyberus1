@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZAUR | CHROME</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts: 'Space Grotesk' is used as the main font. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Space+Grotesk:wght@300;400;500;600&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #e0e0e0;
+            --chrome-gradient: linear-gradient(180deg, #fff 0%, #888 40%, #222 50%, #888 60%, #fff 100%);
+            --liquid-color: #silver;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Space Grotesk', sans-serif; /* Switched to main font */
+            overflow-x: hidden;
+            margin: 0;
+            cursor: none; /* Custom cursor */
+        }
+        
+        /* SOLUTION: Orbitron is used for all headers. */
+        h1, h2, h3 {
+            font-family: 'Orbitron', 'Space Grotesk', sans-serif; 
+            text-transform: uppercase;
+        }
+        
+        /* Orbitron is used for the 'font-chrome' class, abandoning Syncopate. */
+        .font-chrome {
+            font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+        }
+        
+        /* --- NEW BRAND FONT (Orbitron) --- */
+        .font-brand {
+            font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* --- LIQUID METAL BACKGROUND --- */
+        .liquid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            background: radial-gradient(circle, rgba(200,200,200,0.15) 0%, rgba(50,50,50,0.05) 50%, transparent 70%);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            filter: blur(40px);
+            animation: morph 15s infinite alternate linear;
+            opacity: 0.8;
+        }
+
+        .blob-1 { top: -20%; left: -10%; width: 70vw; height: 70vw; animation-duration: 20s; }
+        .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; animation-duration: 25s; animation-direction: reverse; }
+        .blob-3 { top: 40%; left: 30%; width: 40vw; height: 40vw; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); animation-duration: 18s; }
+
+        @keyframes morph {
+            0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: rotate(0deg); }
+            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: rotate(360deg); }
+        }
+
+        /* --- CHROME TEXT EFFECT --- */
+        .text-chrome {
+            background: var(--chrome-gradient);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0px 2px 10px rgba(255,255,255,0.2);
+            animation: shine 6s linear infinite;
+        }
+
+        @keyframes shine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        #cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+            mix-blend-mode: difference;
+            backdrop-filter: blur(2px);
+        }
+
+        body.hovering #cursor {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.8);
+            mix-blend-mode: normal;
+            border-color: transparent;
+        }
+
+        /* --- CANVAS (MOLTEN SILVER) --- */
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        body.drawing-mode #canvas {
+            pointer-events: auto;
+            opacity: 1;
+            cursor: crosshair;
+        }
+
+        /* --- GLASS CARDS --- */
+        .card-metal {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.4s ease;
+        }
+
+        .card-metal:hover {
+            border-color: rgba(255,255,255,0.4);
+            background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(255,255,255,0.1);
+        }
+
+        /* --- SCROLL ANIMATION --- */
+        .reveal {
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        /* --- NAVIGATION --- */
+        .nav-item {
+            position: relative;
+            color: #888;
+            transition: color 0.3s;
+        }
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 1px;
+            background: white;
+            transition: width 0.3s;
+        }
+        .nav-item:hover {
+            color: white;
+        }
+        .nav-item:hover::before {
+            width: 10px;
+        }
+        
+        /* --- LANGUAGE SWITCHER --- */
+        .lang-switcher {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px;
+            border-radius: 9999px;
+            display: flex;
+            gap: 4px;
+        }
+        .lang-btn {
+            color: #888;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 9999px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .lang-btn.active {
+            color: black;
+            background: white;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        .lang-btn:hover:not(.active) {
+            color: white;
+        }
+
+
+        /* --- AUDIO VISUALIZER BARS --- */
+        .bar {
+            width: 3px;
+            background: #fff;
+            border-radius: 2px;
+            animation: equalize 1s infinite alternate;
+            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+        .bar:nth-child(1) { height: 60%; animation-delay: -0.2s; }
+        .bar:nth-child(2) { height: 30%; animation-delay: -0.4s; }
+        .bar:nth-child(3) { height: 70%; animation-delay: -0.6s; }
+        .bar:nth-child(4) { height: 40%; animation-delay: -0.8s; }
+
+        .playing .bar {
+            animation-play-state: running;
+        }
+        .paused .bar {
+            animation-play-state: paused;
+            height: 20% !important; /* Düz çizgiye dönsün */
+            transition: height 0.3s;
+        }
+
+        @keyframes equalize {
+            0% { height: 20%; }
+            100% { height: 100%; }
+        }
+
+    </style>
+</head>
+<body data-lang="en">
+
+    <!-- LIQUID BACKGROUND -->
+    <div class="liquid-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <!-- Grain -->
+        <div class="absolute inset-0 opacity-[0.07]" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E');"></div>
+    </div>
+
+    <!-- CANVAS & CURSOR -->
+    <canvas id="canvas"></canvas>
+    <div id="cursor"></div>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 w-full p-8 md:p-12 z-40 flex justify-between items-start mix-blend-difference pointer-events-none">
+        <div class="pointer-events-auto hoverable flex flex-col">
+            <!-- Brand Font applied here -->
+            <span class="font-brand text-2xl font-bold tracking-tighter text-white">Cyberus</span>
+            <span id="nav-subtitle" class="text-[10px] tracking-[0.3em] uppercase text-gray-400" data-key="nav-subtitle">Penetration Tester</span>
+        </div>
+        
+        <div class="flex flex-col items-end gap-4 pointer-events-auto">
+             <!-- LANGUAGE SWITCHER -->
+            <div id="lang-switcher" class="lang-switcher hoverable">
+                <button class="lang-btn hoverable" data-lang="ru">RU</button>
+                <button class="lang-btn hoverable" data-lang="en">EN</button>
+            </div>
+
+            <div class="hidden md:flex flex-col items-end gap-2 text-xs font-bold tracking-widest uppercase">
+                <a href="#work" class="nav-item hoverable" data-key="nav-projects">Projects</a>
+                <a href="#certifications" class="nav-item hoverable" data-key="nav-certs">Certificates</a>
+                <a href="#contact" class="nav-item hoverable" data-key="nav-contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="relative z-10 px-6 md:px-20 pt-40 pb-20 max-w-[1600px] mx-auto">
+
+        <!-- HERO -->
+        <section class="min-h-[70vh] flex flex-col justify-center">
+            <div class="reveal">
+                <h1 class="text-chrome font-chrome text-6xl md:text-8xl lg:text-9xl font-bold leading-none tracking-tighter mb-8">
+                    Zaur <br> Huseynov.
+                </h1>
+                <!-- JUST THE ICONIC QUOTE -->
+                <p id="hero-text" class="max-w-xl text-lg md:text-xl text-gray-400 font-light leading-relaxed border-l-2 border-white/20 pl-6" data-key="hero-text">
+                    <!-- Will be filled by JS -->
+                </p>
+                <!-- END OF HERO -->
+            </div>
+        </section>
+
+        <!-- PROJECTS -->
+        <section id="work" class="py-20">
+            <div class="flex items-center justify-between mb-16 reveal">
+                <span id="work-title" class="font-chrome text-xl text-white" data-key="work-title">DEPLOYED_SOLUTIONS</span>
+                <div class="h-[1px] bg-white/20 flex-grow mx-8"></div>
+                <span class="text-xs text-gray-500">01 — 04</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Project 1: Osinera (UPDATED) -->
+                <a href="https://osinera.com" target="_blank" class="card-metal p-8 md:p-12 reveal hoverable group cursor-pointer block">
+                    <div class="flex justify-between items-start mb-12">
+                        <span class="text-xs border border-white/20 px-2 py-1 rounded text-gray-400" data-key="year-2024">2024</span>
+                        <!-- External link icon to show it's a link -->
+                        <svg class="w-6 h-6 text-gray-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </div>
+                    <!-- Project name updated -->
+                    <h3 class="font-chrome text-3xl md:text-4xl text-white mb-4 group-hover:text-chrome">Osinera</h3>
+                    <!-- Project description will be filled by JS -->
+                    <p id="proj1-desc" class="text-sm text-gray-400" data-key="proj1-desc">Co-founderi olduğum kiber təhlükəsizlik layihəsi.</p>
+                </a>
+                <!-- End of Project 1 -->
+
+                       </div>
+        </section>
+
+        <!-- CERTIFICATIONS (New Section) -->
+        <section id="certifications" class="py-20">
+            <div class="flex items-center justify-between mb-16 reveal">
+                <span id="certs-title" class="font-chrome text-xl text-white" data-key="certs-title">CERTIFIED_DEFENSES</span>
+                <div class="h-[1px] bg-white/20 flex-grow mx-8"></div>
+                <span class="text-xs text-gray-500">01 — 05</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                
+                <!-- Sertifikat 1: EWPTX -->
+                <div class="card-metal p-6 reveal hoverable group flex flex-col items-center text-center">
+                    <div class="w-12 h-12 mb-3 flex items-center justify-center">
+                         <!-- LOGO LOCATION: File path is here. PLEASE CHANGE. -->
+                        <img src="assets/logos/ewptx.png" alt="eWPTX Logo" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="font-chrome text-sm text-white mb-1">eWPTX</h3>
+                    <p class="text-[10px] text-gray-400 uppercase" data-key="cert1-desc">Qabaqcıl veb pentest sertifikatı</p>
+                </div>
+
+                <!-- Sertifikat 2: ECCPT -->
+                <div class="card-metal p-6 reveal hoverable group flex flex-col items-center text-center" style="transition-delay: 0.1s">
+                    <div class="w-12 h-12 mb-3 flex items-center justify-center">
+                        <!-- LOGO LOCATION: File path is here. PLEASE CHANGE. -->
+                        <img src="assets/logos/eccpt.png" alt="eCCPT Logo" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="font-chrome text-sm text-white mb-1">eCCPT</h3>
+                    <p class="text-[10px] text-gray-400 uppercase" data-key="cert2-desc">Peşəkar kiberhücum ekspert sertifikatı</p>
+                </div>
+
+                <!-- Sertifikat 3: EJPT -->
+                <div class="card-metal p-6 reveal hoverable group flex flex-col items-center text-center" style="transition-delay: 0.2s">
+                    <div class="w-12 h-12 mb-3 flex items-center justify-center">
+                        <!-- LOGO LOCATION: File path is here. PLEASE CHANGE. -->
+                        <img src="assets/logos/ejpt.png" alt="eJPT Logo" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="font-chrome text-sm text-white mb-1">eJPT</h3>
+                    <p class="text-[10px] text-gray-400 uppercase" data-key="cert3-desc">Əsas səviyyə pentest sertifikatı</p>
+                </div>
+                
+                <!-- Sertifikat 4: PT1 -->
+                <div class="card-metal p-6 reveal hoverable group flex flex-col items-center text-center" style="transition-delay: 0.3s">
+                    <div class="w-12 h-12 mb-3 flex items-center justify-center">
+                        <!-- LOGO LOCATION: File path is here. PLEASE CHANGE. -->
+                        <img src="assets/logos/pt1.png" alt="PT1 Logo" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="font-chrome text-sm text-white mb-1">PT1</h3>
+                    <p class="text-[10px] text-gray-400 uppercase" data-key="cert4-desc">Praktiki başlanğıc pentest sertifikatı</p>
+                </div>
+
+                <!-- Sertifikat 5: CRTA -->
+                <div class="card-metal p-6 reveal hoverable group flex flex-col items-center text-center" style="transition-delay: 0.4s">
+                    <div class="w-12 h-12 mb-3 flex items-center justify-center">
+                        <!-- LOGO LOCATION: File path is here. PLEASE CHANGE. -->
+                        <img src="assets/logos/crta.png" alt="CRTA Logo" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="font-chrome text-sm text-white mb-1">CRTA</h3>
+                    <p class="text-[10px] text-gray-400 uppercase" data-key="cert5-desc">Qabaqcıl AD hücum sertifikatı</p>
+                </div>
+                
+            </div>
+        </section>
+        <!-- END OF CERTIFICATIONS -->
+
+
+        <!-- FOOTER -->
+        <section id="contact" class="pt-32 pb-12 text-center reveal">
+            <h2 id="footer-title" class="font-chrome text-4xl md:text-6xl text-white mb-8" data-key="footer-title">Forging Security</h2>
+            <a href="mailto:zaurgsynv@gmail.com" class="inline-block text-gray-400 hover:text-white border-b border-gray-700 hover:border-white transition-all pb-1 mb-16 text-lg hoverable">
+                zaurgsynv@gmail.com
+            </a>
+
+            <!-- LINKS UPDATED: LINKEDIN AND MEDIUM ONLY -->
+            <div class="flex justify-center gap-8 text-[10px] uppercase tracking-[0.2em] text-gray-500">
+                <a href="https://www.linkedin.com/in/zaur-guseinov-19073a29b/" class="hover:text-white transition-colors hoverable" target="_blank">LinkedIn</a>
+                <a href="https://medium.com/@huseynovzaur494" class="hover:text-white transition-colors hoverable" target="_blank">Medium</a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MUSIC PLAYER (Bottom Left) -->
+    <div class="fixed bottom-10 left-10 z-50 group hoverable">
+        <div id="musicPlayer" class="card-metal pl-3 pr-5 py-2 rounded-full flex items-center gap-4 cursor-pointer hover:bg-white/5 transition-colors">
+            
+            <!-- Play/Pause Icon Container -->
+            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10 group-hover:border-white/30 transition-colors">
+                <svg id="playIcon" class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="pauseIcon" class="w-4 h-4 text-white hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </div>
+
+            <!-- Track Info -->
+            <div class="flex flex-col">
+                <span id="audio-label" class="text-[9px] font-bold tracking-widest text-gray-500 uppercase" data-key="audio-label">System Audio</span>
+                <span class="text-xs font-chrome text-white tracking-widest">Cyber_Street.mp3</span>
+            </div>
+
+            <!-- Visualizer Bars -->
+            <div id="visualizer" class="flex items-end gap-[3px] h-4 ml-2 paused">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+        </div>
+        
+        <!-- Audio Element (Sample Cyberpunk/Tech Track) -->
+        <audio id="audioSource" loop>
+            <source src="https://assets.mixkit.co/music/preview/mixkit-cyber-street-2319.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- INTERACTION FAB (Bottom Right) -->
+    <div class="fixed bottom-10 right-10 z-50 flex flex-col items-end gap-3">
+        <button id="drawToggle" class="w-16 h-16 rounded-full bg-white/5 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-black hover:scale-110 transition-all duration-300 hoverable group">
+            <svg id="iconPen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+            <svg id="iconClose" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <button id="clearBtn" class="bg-black/80 backdrop-blur text-white text-[10px] uppercase tracking-widest px-4 py-2 rounded-full border border-white/10 hidden hover:bg-red-900/50 hover:border-red-500 transition-colors" data-key="reset-metal">
+            Reset Metal
+        </button>
+    </div>
+
+    <script>
+        // --- TRANSLATION DATA ---
+        const translations = {
+            'nav-subtitle': {
+                ru: 'Пентестер',
+                en: 'Penetration Tester'
+            },
+            'nav-projects': {
+                ru: 'Проекты',
+                en: 'Projects'
+            },
+            'nav-certs': {
+                ru: 'Сертификаты',
+                en: 'Certificates'
+            },
+            'nav-contact': {
+                ru: 'Контакты',
+                en: 'Contact'
+            },
+            // HERO TEXT (QUOTE ONLY)
+            'hero-text': {
+                ru: `"Первое правило Бойцовского клуба: не говорить о Бойцовском клубе." <span class="text-white">— Бойцовский клуб</span>`,
+                en: `"The first rule of Fight Club is: You do not talk about Fight Club." <span class="text-white">— Fight Club</span>`
+            },
+            'work-title': {
+                ru: 'РАЗВЕРНУТЫЕ_РЕШЕНИЯ',
+                en: 'DEPLOYED_SOLUTIONS'
+            },
+            // Project Descriptions 
+            'proj1-desc': {
+                // UPDATED
+                ru: 'Со-основанная мной компания по Web Development / Web Design.',
+                en: 'Web Development / Web Design company which I co-founded.'
+            },
+            'proj2-desc': {
+                ru: 'Инфраструктура шифрования государственных данных.',
+                en: 'Government data encryption infrastructure.'
+            },
+            'proj3-desc': {
+                ru: 'Транsformasiya arhitektura korporativ şəbəkə.',
+                en: 'Enterprise network architecture transformation.'
+            },
+            'proj4-desc': {
+                ru: 'Симуляция угроз повышенной сложности (Red Team).',
+                en: 'Advanced threat simulation (Red Team).'
+            },
+            // CERTIFICATES BLOCK
+            'certs-title': {
+                ru: 'ДОКУМЕНТИРОВАННЫЙ_АНАЛИЗ',
+                en: 'CERTIFIED_DEFENSES'
+            },
+            'cert1-desc': {
+                ru: 'Продвинутый веб-пентест сертификат',
+                en: 'Advanced web penetration certification'
+            },
+            'cert2-desc': {
+                ru: 'Сертификат эксперта по пентесту',
+                en: 'Certified professional penetration tester'
+            },
+            'cert3-desc': {
+                ru: 'Базовый сертификат по пентесту',
+                en: 'Junior penetration tester certification'
+            },
+            'cert4-desc': {
+                ru: 'Практический начальный пентест сертификат',
+                en: 'Practical beginner pentest certification'
+            },
+            'cert5-desc': {
+                ru: 'Продвинутый сертификат атак на AD',
+                en: 'Advanced Active Directory attack certification'
+            },
+            // Footer & Misc
+            'footer-title': {
+                ru: 'КОВКА БЕЗОПАСНОСТИ',
+                en: 'FORGING SECURITY'
+            },
+            'audio-label': {
+                ru: 'СИСТЕМНОЕ АУДИО',
+                en: 'SYSTEM AUDIO'
+            },
+            'reset-metal': {
+                ru: 'Сбросить Металл',
+                en: 'Reset Metal'
+            },
+        };
+
+        function setLanguage(lang) {
+            document.body.setAttribute('data-lang', lang);
+
+            // Update all elements with a data-key attribute
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[key] && translations[key][lang]) {
+                    // Check if the content contains HTML (like hero-text)
+                    if (key === 'hero-text') {
+                        el.innerHTML = translations[key][lang];
+                    } else {
+                        el.textContent = translations[key][lang];
+                    }
+                }
+            });
+
+            // Update lang switcher buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // --- LANGUAGE SWITCHER LOGIC ---
+        document.getElementById('lang-switcher').addEventListener('click', (e) => {
+            if (e.target.classList.contains('lang-btn')) {
+                const newLang = e.target.getAttribute('data-lang');
+                setLanguage(newLang);
+            }
+        });
+
+        // Set initial language to ENGLISH on load
+        setLanguage('en');
+
+
+        // --- REST OF THE SCRIPTS (Unchanged) ---
+        
+        // --- MUSIC PLAYER LOGIC ---
+        const musicPlayer = document.getElementById('musicPlayer');
+        const audioSource = document.getElementById('audioSource');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const visualizer = document.getElementById('visualizer');
+
+        let isPlaying = false;
+
+        musicPlayer.addEventListener('click', () => {
+            if (isPlaying) {
+                audioSource.pause();
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+                visualizer.classList.remove('playing');
+                visualizer.classList.add('paused');
+            } else {
+                audioSource.play();
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+                visualizer.classList.add('playing');
+                visualizer.classList.remove('paused');
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // --- CUSTOM CURSOR ---
+        const cursor = document.getElementById('cursor');
+        const hoverables = document.querySelectorAll('.hoverable');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        hoverables.forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+        });
+
+        // --- DRAWING LOGIC (MOLTEN SILVER) ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const drawToggle = document.getElementById('drawToggle');
+        const clearBtn = document.getElementById('clearBtn');
+        const iconPen = document.getElementById('iconPen');
+        const iconClose = document.getElementById('iconClose');
+
+        let isDrawingMode = false;
+        let isDrawing = false;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Silver Metal Style
+            ctx.lineJoin = "round";
+            ctx.lineCap = "round";
+            ctx.lineWidth = 6;
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
+            ctx.strokeStyle = "#e0e0e0"; 
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        drawToggle.addEventListener('click', () => {
+            isDrawingMode = !isDrawingMode;
+            document.body.classList.toggle('drawing-mode');
+
+            if(isDrawingMode) {
+                iconPen.classList.add('hidden');
+                iconClose.classList.remove('hidden');
+                clearBtn.classList.remove('hidden');
+            } else {
+                iconPen.classList.remove('hidden');
+                iconClose.classList.add('hidden');
+                clearBtn.classList.add('hidden');
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        function startDrawing(e) {
+            if (!isDrawingMode) return;
+            isDrawing = true;
+            ctx.beginPath();
+            draw(e);
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            ctx.beginPath();
+        }
+
+        function draw(e) {
+            if (!isDrawing || !isDrawingMode) return;
+            
+            let clientX, clientY;
+            if(e.type.includes('touch')) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            // Draw with "Metallic" feel
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 4;
+            ctx.lineTo(clientX, clientY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(clientX, clientY);
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+        canvas.addEventListener('touchend', stopDrawing);
+
+        // --- SCROLL ANIMATION ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    </script>
+</body>
+</html>
